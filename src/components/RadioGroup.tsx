@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-interface RadioOption {
+export interface RadioOption {
   value: string;
   label: string;
   description?: string;

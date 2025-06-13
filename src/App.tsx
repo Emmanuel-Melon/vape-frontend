@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
-import { VaporizerQuiz } from './components/quiz/VaporizerQuiz';
+import VaporizerQuiz from './components/quiz/VaporizerQuiz';
 import { HomePage } from './components/HomePage';
 import { SavedPage } from './components/SavedPage';
 import { ExplorePage } from './components/ExplorePage';

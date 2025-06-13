@@ -64,14 +64,25 @@ export const followUpExperienceQuestions = {
 // Common questions for usage and portability
 export const commonQuestions = [
   {
-    id: 'usage',
+    id: 'primaryUse',
+    title: 'How will you primarily use your vaporizer?',
+    description: 'This helps us tailor recommendations for your main activities.',
+    emoji: '🎯',
+    options: [
+      { value: 'medical', label: 'Medical Use', description: 'Primarily for therapeutic or medical purposes', emoji: '⚕️' },
+      { value: 'recreational', label: 'Recreational Use', description: 'Primarily for enjoyment and relaxation', emoji: '🎉' },
+      { value: 'both', label: 'Both Medical & Recreational', description: 'A mix of therapeutic and recreational use', emoji: '⚖️' }
+    ]
+  },
+  {
+    id: 'usagePattern',
     title: 'How often do you plan to use it?',
     description: 'Usage frequency affects battery life and durability needs',
     emoji: '📅',
     options: [
-      { value: 'casual', label: 'Casual Use', description: 'Weekends, social situations, few times a month', emoji: '🎉' },
-      { value: 'daily', label: 'Daily User', description: 'Regular daily use, 1-3 sessions per day', emoji: '📱' },
-      { value: 'heavy', label: 'Heavy Use', description: 'Multiple sessions daily, group sessions', emoji: '👥' }
+      { value: 'casual', label: 'Casual Use', description: 'Weekends, social situations, few times a month', emoji: '🥳' },
+      { value: 'daily', label: 'Daily User', description: 'Regular daily use, 1-3 sessions per day', emoji: '🗓️' },
+      { value: 'heavy', label: 'Heavy Use', description: 'Multiple sessions daily, group sessions', emoji: '🏋️‍♂️' }
     ]
   },
   {
@@ -80,9 +91,10 @@ export const commonQuestions = [
     description: 'Location determines whether you need portable or desktop power',
     emoji: '📏',
     options: [
-      { value: 'portable', label: 'On the Go', description: 'Need something portable for travel and outdoor use', emoji: '🎒' },
-      { value: 'desktop', label: 'At Home', description: 'Mainly at home, prefer power over portability', emoji: '🏠' },
-      { value: 'no-preference', label: 'Both', description: 'Want versatility for home and travel', emoji: '🔄' }
+      { value: 'pocket-size', label: 'Pocket-Sized', description: 'Ultra-portable, fits in a pocket for maximum discretion', emoji: '🤏' },
+      { value: 'portable', label: 'Portable (Bag/Purse)', description: 'Portable enough for a bag or purse, good for travel', emoji: '🎒' },
+      { value: 'desktop', label: 'At Home Only', description: 'Mainly at home, power and performance are key', emoji: '🏠' },
+      { value: 'no-preference', label: 'No Strong Preference', description: 'Versatility is welcome, or not a primary concern', emoji: '🤷‍♀️'}
     ]
   }
 ];

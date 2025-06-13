@@ -1,6 +1,8 @@
+import { UserPreferencesFormData } from '../lib/schemas';
+
 export interface UserPreferences {
   // Common initial questions
-  cannabisExperience: 'novice' | 'experienced' | null;
+  cannabisExperience: 'novice' | 'some-experience' | 'experienced' | null;
   primaryUse: 'medical' | 'recreational' | 'both' | null;
   
   // Novice path specific
@@ -31,7 +33,7 @@ export interface UserPreferences {
   };
 }
 
-export type QuizStep = 'experience' | 'usage' | 'portability' | 'budget' | 'priorities';
+export type QuizStep = 'experience' | 'primaryUse' | 'usagePattern' | 'portability' | 'budget' | 'priorities';
 
 export interface VaporizerRecommendation {
   id: string;
@@ -45,6 +47,7 @@ export interface VaporizerRecommendation {
   
   // Ratings (1-10)
   ratings: {
+    maintenanceRequired: number;
     vaporPotency: number;
     vaporComfort: number;
     portability: number;
@@ -90,7 +93,7 @@ export interface QuizResult {
 export interface SavedQuizResult {
   id: string;
   timestamp: number;
-  preferences: UserPreferences;
+  preferences: UserPreferencesFormData; // Align with form data structure
   result: QuizResult;
   nickname?: string;
 }
