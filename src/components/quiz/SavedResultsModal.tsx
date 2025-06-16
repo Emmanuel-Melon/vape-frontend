@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Clock, Star, Trash2, Edit3, Check, Calendar } from 'lucide-react';
-import { SavedQuizResult } from '../types/vaporizer';
-import { getSavedQuizResults, deleteSavedQuizResult, updateQuizResultNickname } from '../utils/quizStorage';
+import { SavedQuizResult } from '../../types/vaporizer';
+import { getSavedQuizResults, deleteSavedQuizResult, updateQuizResultNickname } from '../../utils/quizStorage';
 
 interface SavedResultsModalProps {
   isOpen: boolean;

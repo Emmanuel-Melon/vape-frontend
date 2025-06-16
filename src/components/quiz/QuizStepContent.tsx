@@ -1,315 +1,193 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { QuizStep } from '../../types/vaporizer'; 
-import { UserPreferencesFormData } from '../../lib/schemas'; 
-import { UseFormSetValue, Control, Controller, FieldError } from 'react-hook-form'; 
-import { RadioGroup, RadioOption } from '../RadioGroup'; 
-import { BudgetSlider } from '../BudgetSlider';
-import { PrioritySlider } from '../PrioritySlider';
-import { initialExperienceOptions, commonQuestions, educationalContent as allEducationalContent } from '../../data/quizContent';
+import { motion } from 'framer-motion';
+import { z } from 'zod';
+import { QuestionResponseSchema } from '../../hooks/use-quizzes';
+import { RadioGroup } from '../RadioGroup';
+import { CheckboxGroup } from '../CheckboxGroup';
+import { RangeSlider } from '../RangeSlider';
+import { RankOrderList } from '../RankOrderList';
+import { educationalContent } from '../../data/quizContent'; // Import educational content
+
+// Define types locally using zod infer
+export type QuestionDisplay = z.infer<typeof QuestionResponseSchema>;
+
+// Explicitly define the schema for the 'answer' payload part
+const AnswerObjectSchema = z.object({
+  selectedOptionValue: z.string().optional(),
+  selectedOptionValues: z.array(z.string()).optional(),
+  rankedOptions: z.array(z.object({
+    optionValue: z.string(),
+    rank: z.number(),
+  })).optional(),
+  rangeValue: z.number().optional(),
+});
+export type AnswerPayload = z.infer<typeof AnswerObjectSchema>;
 
 interface QuizStepContentProps {
-  currentStep: QuizStep;
-  preferences: UserPreferencesFormData; 
-  // setValue: UseFormSetValue<UserPreferencesFormData>; // Removed as it's unused with Controller
-  control: Control<UserPreferencesFormData>; 
+  question: QuestionDisplay;
+  currentAnswer: AnswerPayload | undefined;
+  onAnswerChange: (answerPayload: Partial<AnswerPayload>) => void;
   animationDirection: 'next' | 'previous' | 'initial';
 }
 
-const FieldErrorMessage: React.FC<{ error?: FieldError | { message?: string } }> = ({ error }) => {
-  if (!error?.message) return null;
-  return <p className="text-sm text-red-600 mt-1">{error.message}</p>;
+interface EducationalTip {
+  title: string;
+  content: string;
+  bgColor: string;
+  textColor: string;
+  titleColor: string;
+}
+
+const getEducationalContentForQuestion = (
+  question: QuestionDisplay,
+  currentAnswer: AnswerPayload | undefined
+): EducationalTip | null => {
+  let topic: keyof typeof educationalContent | null = null;
+  let answerValue: string | undefined = currentAnswer?.selectedOptionValue;
+
+  // Placeholder logic to determine topic based on question text
+  // This should be refined based on how questions are categorized in your API data
+  const questionTextLower = question.text.toLowerCase();
+  if (questionTextLower.includes('experience')) {
+    topic = 'experience';
+  } else if (questionTextLower.includes('how often do you plan to use it')) {
+    topic = 'usage';
+  } else if (questionTextLower.includes('where will you primarily use it')) {
+    topic = 'portability';
+  }
+
+  // Handle specific answer value mapping if needed (e.g., 'pocket-size' to 'portable' for tips)
+  if (topic === 'portability' && answerValue === 'pocket-size') {
+    answerValue = 'portable'; // Use 'portable' tip for 'pocket-size' answers
+  }
+
+  if (topic && answerValue && educationalContent[topic] && (educationalContent[topic] as any)[answerValue]) {
+    const contentString = (educationalContent[topic] as any)[answerValue];
+    return {
+      title: "💡 Pro Tip!",
+      content: contentString,
+      bgColor: "bg-blue-50",
+      textColor: "text-blue-700",
+      titleColor: "text-blue-800",
+    };
+  }
+
+  return null;
 };
 
 export const QuizStepContent: React.FC<QuizStepContentProps> = ({
-  currentStep,
-  preferences, 
-  // setValue, // Removed as it's unused with Controller
-  control,
+  question,
+  currentAnswer,
+  onAnswerChange,
   animationDirection,
 }) => {
   const renderStepSpecificContent = () => {
-    switch (currentStep) {
-      case 'experience':
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-black dark:text-gray-100 mb-4">
-                What's your experience with vaporizers?
-              </h2>
-              <p className="text-black dark:text-gray-300 text-lg">
-                This helps us recommend the right complexity level for you
-              </p>
-            </div>
-            <Controller
-              name="cannabisExperience"
-              control={control}
-              render={({ field, fieldState: { error } }) => (
-                <>
-                  <RadioGroup
-                    options={initialExperienceOptions}
-                    value={field.value || ''}
-                    onChange={field.onChange}
-                    name={field.name}
-                  />
-                  <FieldErrorMessage error={error} />
-                </>
-              )}
-            />
+    const { type, text, subtitle, options, rangeMin, rangeMax, rangeStep, rangeDefault } = question;
+
+    return (
+      <div className="space-y-6">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-black dark:text-gray-100 mb-4">
+            {text}
+          </h2>
+          {subtitle && (
+            <p className="text-black dark:text-gray-300 text-lg">
+              {subtitle}
+            </p>
+          )}
+        </div>
+
+        {type === 'WELCOME' && (
+          <div className="text-center text-gray-700 dark:text-gray-300">
+            <p>Click next to begin!</p>
           </div>
-        );
-      case 'primaryUse':
-        const primaryUseOptions: RadioOption[] = commonQuestions.find(q => q.id === 'primaryUse')?.options || [];
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-black dark:text-gray-100 mb-4">
-                How will you primarily use your vaporizer?
-              </h2>
-              <p className="text-black dark:text-gray-300 text-lg">
-                This helps us tailor recommendations for your main activities.
-              </p>
-            </div>
-            <Controller
-              name="primaryUse"
-              control={control}
-              render={({ field, fieldState: { error } }) => (
-                <>
-                  <RadioGroup
-                    options={primaryUseOptions}
-                    value={field.value || ''}
-                    onChange={field.onChange}
-                    name={field.name}
-                  />
-                  <FieldErrorMessage error={error} />
-                </>
-              )}
-            />
-          </div>
-        );
-      case 'usagePattern':
-        const usageOptions: RadioOption[] = commonQuestions.find(q => q.id === 'usagePattern')?.options || [];
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-black dark:text-gray-100 mb-4">
-                How often do you plan to use it?
-              </h2>
-              <p className="text-black dark:text-gray-300 text-lg">
-                Usage frequency affects battery life and durability needs.
-              </p>
-            </div>
-            <Controller
-              name="usagePattern"
-              control={control}
-              render={({ field, fieldState: { error } }) => (
-                <>
-                  <RadioGroup
-                    options={usageOptions}
-                    value={field.value || ''}
-                    onChange={field.onChange}
-                    name={field.name}
-                  />
-                  <FieldErrorMessage error={error} />
-                </>
-              )}
-            />
-          </div>
-        );
-      case 'portability':
-        const portabilityOptions: RadioOption[] = commonQuestions.find(q => q.id === 'portability')?.options || [];
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-black dark:text-gray-100 mb-4">
-                Where will you primarily use it?
-              </h2>
-              <p className="text-black dark:text-gray-300 text-lg">
-                Location determines whether you need portable or desktop power
-              </p>
-            </div>
-            <Controller
-              name="portability"
-              control={control}
-              render={({ field, fieldState: { error } }) => (
-                <>
-                  <RadioGroup
-                    options={portabilityOptions}
-                    value={field.value || ''}
-                    onChange={field.onChange}
-                    name={field.name}
-                  />
-                  <FieldErrorMessage error={error} />
-                </>
-              )}
-            />
-          </div>
-        );
-      case 'budget':
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-black dark:text-gray-100 mb-4">
-                What's your budget?
-              </h2>
-              <p className="text-black dark:text-gray-300 text-lg">
-                We'll find the best value within your price range
-              </p>
-            </div>
-            <Controller
-              name="budget"
-              control={control}
-              render={({ field, fieldState: { error } }) => (
-                <>
-                  <BudgetSlider
-                    value={field.value}
-                    onChange={field.onChange}
-                    min={50}
-                    max={800}
-                    experienceLevel={preferences.cannabisExperience} 
-                  />
-                  <FieldErrorMessage error={error} />
-                </>
-              )}
-            />
-          </div>
-        );
-      case 'priorities':
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-black dark:text-gray-100 mb-4">
-                What matters most to you?
-              </h2>
-              <p className="text-black dark:text-gray-300 text-lg">
-                Rank these features by importance (1 = least important, 10 = most important)
-              </p>
-            </div>
-            <Controller
-              name="priorities"
-              control={control}
-              render={({ field, fieldState: { error } }) => (
-                <>
-                  <PrioritySlider
-                    priorities={field.value}
-                    onChange={field.onChange}
-                  />
-                  <FieldErrorMessage error={error} /> 
-                  {error?.root?.message && <FieldErrorMessage error={error.root} />}
-                </>
-              )}
-            />
-          </div>
-        );
-      default:
-        return null;
-    }
+        )}
+
+        {type === 'SINGLE_SELECT' && options && (
+          <RadioGroup
+            options={options.map(opt => ({ 
+              label: opt.label, 
+              value: opt.value, 
+              description: opt.description 
+            }))}
+            value={currentAnswer?.selectedOptionValue || ''}
+            onChange={(value) => onAnswerChange({ selectedOptionValue: value })}
+            name={question.id.toString()}
+          />
+        )}
+
+        {type === 'MULTI_SELECT' && options && (
+          <CheckboxGroup
+            options={options.map(opt => ({ 
+              label: opt.label, 
+              value: opt.value, 
+              description: opt.description 
+            }))}
+            selectedValues={currentAnswer?.selectedOptionValues || []}
+            onChange={(values) => onAnswerChange({ selectedOptionValues: values })}
+            name={question.id.toString()}
+          />
+        )}
+
+        {type === 'RANKED_SELECT' && options && (
+          <RankOrderList
+            options={options.map(opt => ({ id: opt.value, content: opt.label }))}
+            rankedItems={(
+              currentAnswer?.rankedOptions
+                ?.slice()
+                .sort((a, b) => a.rank - b.rank)
+                .map(item => item.optionValue)
+            ) || options.map(opt => opt.value)}
+            onChange={(newRankedValues) => {
+              const newRankedOptions = newRankedValues.map((optionValue, index) => ({
+                optionValue,
+                rank: index + 1,
+              }));
+              onAnswerChange({ rankedOptions: newRankedOptions });
+            }}
+            name={question.id.toString()}
+          />
+        )}
+
+        {type === 'RANGE_SLIDER' && (
+          <RangeSlider
+            min={rangeMin ?? 0}
+            max={rangeMax ?? 100}
+            step={rangeStep ?? 1}
+            value={currentAnswer?.rangeValue ?? rangeDefault ?? rangeMin ?? 0}
+            onChange={(value) => onAnswerChange({ rangeValue: value })}
+            name={question.id.toString()}
+            showValue={true}
+          />
+        )}
+      </div>
+    );
   };
 
-  const getEducationalContentForStep = () => {
-    let tipContent: string | undefined;
-    let tipTitle: string = "Pro Tip:";
-    let bgColor = "bg-gray-50";
-    let textColor = "text-gray-700";
-    let titleColor = "text-gray-800";
-
-    switch (currentStep) {
-      case 'experience':
-        const currentExperience = preferences.cannabisExperience;
-        if (currentExperience && allEducationalContent.experience) {
-          if (currentExperience in allEducationalContent.experience) {
-            tipContent = allEducationalContent.experience[currentExperience as keyof typeof allEducationalContent.experience];
-            tipTitle = "Experience Tip:";
-            bgColor = "bg-blue-50";
-            textColor = "text-blue-700";
-            titleColor = "text-blue-800";
-          } else {
-            console.warn(`Educational content for experience '${currentExperience}' not found.`);
-          }
-        }
-        break;
-      case 'usage':
-        if (preferences.usagePattern && allEducationalContent.usage) {
-          tipContent = allEducationalContent.usage[preferences.usagePattern as keyof typeof allEducationalContent.usage];
-          // if (preferences.primaryUse && allEducationalContent.primaryUse) { // This key does not exist on allEducationalContent
-          //   const primaryUseTip = allEducationalContent.primaryUse[preferences.primaryUse as keyof typeof allEducationalContent.primaryUse];
-          //   tipContent = primaryUseTip ? `${primaryUseTip} ${tipContent || ''}` : tipContent;
-          // }
-          tipTitle = "Usage Tip:";
-          bgColor = "bg-green-50";
-          textColor = "text-green-700";
-          titleColor = "text-green-800";
-        }
-        break;
-      case 'portability':
-        if (preferences.portability && allEducationalContent.portability) {
-          const portabilityKey = preferences.portability === 'pocket-size' ? 'portable' : preferences.portability; 
-          tipContent = allEducationalContent.portability[portabilityKey as keyof typeof allEducationalContent.portability];
-          tipTitle = "Portability Tip:";
-          bgColor = "bg-purple-50";
-          textColor = "text-purple-700";
-          titleColor = "text-purple-800";
-        }
-        break;
-      case 'budget':
-        tipTitle = "Budget Guide:";
-        bgColor = "bg-yellow-50";
-        textColor = "text-yellow-700";
-        titleColor = "text-yellow-800";
-        if (preferences.budget < 100) tipContent = "Entry-level vaporizers offer basic features and decent performance, great for starting out.";
-        else if (preferences.budget < 200) tipContent = "Mid-range options provide a balance of better build quality, more features, and good vapor.";
-        else if (preferences.budget < 300) tipContent = "Premium vaporizers deliver excellent performance, advanced features, and superior materials.";
-        else tipContent = "Top-tier devices boast the best technology, materials, and an unparalleled vaping experience.";
-        break;
-      case 'priorities':
-        return null;
-      default:
-        return null;
-    }
-
-    if (!tipContent) return null;
-
-    return {
-      title: tipTitle,
-      content: tipContent,
-      bgColor,
-      textColor,
-      titleColor,
-    };
-  };
-
-  const currentEducationalContent = getEducationalContentForStep();
+  const tip = getEducationalContentForQuestion(question, currentAnswer);
 
   return (
     <motion.div
+      key={question.id}
       initial={{ opacity: 0, x: animationDirection === 'next' ? 100 : animationDirection === 'previous' ? -100 : 0 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: animationDirection === 'next' ? -100 : animationDirection === 'previous' ? 100 : 0 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="flex-grow flex flex-col justify-between" 
+      className="flex-grow flex flex-col justify-between"
     >
       <div>{renderStepSpecificContent()}</div>
-
-      <AnimatePresence>
-        {currentEducationalContent && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3, delay: 0.2 }} 
-            className={`mt-8 p-4 rounded-lg ${currentEducationalContent.bgColor} dark:bg-opacity-20`}
-          >
-            <h3 className={`font-semibold ${currentEducationalContent.titleColor} dark:text-opacity-90 mb-2`}>
-              {currentEducationalContent.title}
-            </h3>
-            <p className={`${currentEducationalContent.textColor} dark:text-opacity-80`}>
-              {currentEducationalContent.content}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {tip && (
+        <motion.div 
+          className={`mt-8 p-6 rounded-xl border border-opacity-20 ${tip.bgColor}`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }} // Added exit animation from old.tsx
+          transition={{ duration: 0.3 }} // Removed delay from old.tsx
+        >
+          <h3 className={`font-semibold mb-2 ${tip.titleColor}`}>{tip.title}</h3>
+          <p className={tip.textColor}>{tip.content}</p>
+        </motion.div>
+      )}
     </motion.div>
-    // AnimatePresence closing tag removed
   );
-
 };

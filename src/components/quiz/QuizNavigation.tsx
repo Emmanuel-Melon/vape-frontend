@@ -36,10 +36,11 @@ export const QuizNavigation: React.FC<QuizNavigationProps> = ({
           <ChevronLeft size={24} />
         </motion.button>
       )}
-      {!isMobile && canProceed() && (
+      {!isMobile && (
         <motion.button
           onClick={handleNext}
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center text-white"
+          disabled={!canProceed()}
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed"
           style={{ marginRight: '-64px' }} // Adjust as needed
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -53,7 +54,7 @@ export const QuizNavigation: React.FC<QuizNavigationProps> = ({
 
       {/* Mobile Bottom Navigation */}
       <AnimatePresence>
-        {isMobile && (currentStepIndex > 0 || canProceed()) && (
+        {isMobile && (
           <motion.div 
             className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md p-4 border-t border-gray-200 shadow-top-lg z-50 flex justify-between items-center"
             initial={{ y: "100%" }}
@@ -73,15 +74,14 @@ export const QuizNavigation: React.FC<QuizNavigationProps> = ({
               <div></div> // Empty div to maintain spacing
             )}
 
-            {canProceed() && (
-              <button
-                onClick={handleNext}
-                className="flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all bg-gradient-to-r from-green-500 to-blue-500 text-white hover:from-green-600 hover:to-blue-600 shadow-md hover:shadow-lg"
-              >
-                <span>{currentStepIndex === stepsLength - 1 ? 'Get Results' : 'Next'}</span>
-                {currentStepIndex === stepsLength - 1 ? <Search size={20} /> : <ChevronRight size={20} />}
-              </button>
-            )}
+            <button
+              onClick={handleNext}
+              disabled={!canProceed()}
+              className="flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all bg-gradient-to-r from-green-500 to-blue-500 text-white hover:from-green-600 hover:to-blue-600 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span>{currentStepIndex === stepsLength - 1 ? 'Get Results' : 'Next'}</span>
+              {currentStepIndex === stepsLength - 1 ? <Search size={20} /> : <ChevronRight size={20} />}
+            </button>
           </motion.div>
         )}
       </AnimatePresence>

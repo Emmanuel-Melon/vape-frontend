@@ -10,6 +10,7 @@ import { AuthPage } from './components/AuthPage';
 import { AboutPage } from './components/AboutPage';
 import { TemplateViewPage } from './components/TemplateViewPage';
 import { NotFoundPage } from './components/NotFoundPage';
+import ProductDisplayPage from './pages/ProductDisplayPage'; // Added for product display
 import { CloudNavbar } from './components/CloudNavbar';
 import { MobileNavbar } from './components/MobileNavbar';
 import { useIsMobile } from './hooks/useMediaQuery';
@@ -30,7 +31,7 @@ function App() {
             <div className={`${isMobile ? 'pb-20' : 'pt-20'}`}>
               <Routes>
                 <Route path="/" element={<HomePage />} />
-                <Route path="/quiz" element={<VaporizerQuiz />} />
+                <Route path="/quiz" element={<VaporizerQuiz quizId={1} />} />
                 <Route path="/saved" element={<SavedPage />} />
                 <Route path="/explore" element={<ExplorePage />} />
                 <Route path="/about" element={<AboutPage />} />
@@ -38,6 +39,7 @@ function App() {
                 <Route path="/results/:id" element={<ResultDetailPage />} />
                 <Route path="/seller/:sellerId" element={<SellerProfilePage />} />
                 <Route path="/store-setup" element={<StoreSetupPage />} />
+                <Route path="/products/:slug" element={<ProductDisplayPage />} />
                 {/* 404 catch-all route */}
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>

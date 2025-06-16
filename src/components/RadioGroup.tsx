@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Check } from 'lucide-react';
 
 export interface RadioOption {
   value: string;
@@ -17,45 +18,51 @@ interface RadioGroupProps {
 
 export const RadioGroup: React.FC<RadioGroupProps> = ({ options, value, onChange, name }) => {
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {options.map((option, index) => (
         <motion.label
           key={option.value}
-          className={`block p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:border-green-300 ${
+          htmlFor={`${name}-${option.value}`}
+          className={`block p-4 rounded-xl border cursor-pointer transition-all duration-200 hover:shadow-lg ${
             value === option.value
-              ? 'border-green-500 bg-green-50'
-              : 'border-gray-200 bg-white/70 backdrop-blur-sm hover:bg-gray-50'
+              ? 'border-green-500 bg-green-50 shadow-md ring-2 ring-green-400'
+              : 'border-gray-300 bg-white hover:border-green-400 shadow-sm'
           }`}
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: index * 0.1 }}
-          whileHover={{ scale: 1.02 }}
+          whileHover={{ scale: 1.015 }}
           whileTap={{ scale: 0.98 }}
         >
-          <div className="flex items-center">
+          <div className="flex items-start">
+            {/* Visually Hidden Actual Radio Input */}
             <input
               type="radio"
               name={name}
               value={option.value}
               checked={value === option.value}
               onChange={(e) => onChange(e.target.value)}
-              className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
+              className="sr-only" // Visually hidden
+              id={`${name}-${option.value}`} // ID for the label
             />
-            <div className="ml-3 flex-1">
-              <div className="flex items-center gap-2">
+
+            {/* Custom Radio Button Visual Indicator */}
+            <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center mr-3 mt-0.5 
+                            ${value === option.value ? 'border-green-600 bg-green-600' : 'border-gray-400 bg-white'}`}
+            >
+              {value === option.value && <Check className="w-3 h-3 text-white stroke-[3]" />}
+            </div>
+
+            {/* Icon/Emoji + Text Content */}
+            <div className="flex-1">
+              <div className="flex items-center">
                 {option.emoji && (
-                  <motion.span 
-                    className="text-xl"
-                    animate={{ rotate: value === option.value ? [0, 10, -10, 0] : 0 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    {option.emoji}
-                  </motion.span>
+                  <span className="text-xl mr-2 leading-none">{option.emoji}</span>
                 )}
-                <div className="text-sm font-medium text-gray-900">{option.label}</div>
+                <span className="text-base font-medium text-gray-800">{option.label}</span>
               </div>
               {option.description && (
-                <div className="text-sm text-gray-500 mt-1">{option.description}</div>
+                <p className="text-sm text-gray-600 mt-1">{option.description}</p>
               )}
             </div>
           </div>

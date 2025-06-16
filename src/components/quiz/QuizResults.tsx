@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Star, Award, Battery, Zap, Shield, Wrench, DollarSign, RotateCcw, ExternalLink, Save, BookOpen } from 'lucide-react';
-import { QuizResult, UserPreferences } from '../types/vaporizer';
+import { QuizResult, UserPreferences } from '../../types/vaporizer';
 import { SaveResultModal } from './SaveResultModal';
-import { saveQuizResult } from '../utils/quizStorage';
+import { saveQuizResult } from '../../utils/quizStorage';
 
 interface QuizResultsProps {
   results: QuizResult;
@@ -21,6 +21,9 @@ export const QuizResults: React.FC<QuizResultsProps> = ({
   const { primaryRecommendation, alternatives, explanation, educationalContent, matchScore } = results;
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+
+  console.log("results", results);
+  console.log("preferences", preferences);
 
   const getRatingColor = (rating: number) => {
     if (rating >= 8) return 'text-green-600';
