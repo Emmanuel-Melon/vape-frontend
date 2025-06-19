@@ -12,7 +12,7 @@ export const loginSchema = z.object({
 // Schema for user registration (formerly createUserSchema)
 export const registerSchema = z.object({
   email: z.string().email(),
-  username: z.string(),
+  // username: z.string(), // Username removed as per user request
   password: z.string().min(1, "Password is required"),
 });
 

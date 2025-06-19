@@ -62,9 +62,21 @@ const fetchUsers = async (): Promise<User[]> => {
 };
 
 const fetchUserById = async (id: string): Promise<User> => {
-  const response = await fetch(`${apiUrl}/users/${id}`);
+  const response = await fetch(`${apiUrl}/users/${id}`, {
+    credentials: 'include', // Send cookies with the request
+  });
   if (!response.ok) {
     throw new Error('Network response was not ok');
+  }
+  return response.json();
+};
+
+const fetchCurrentUser = async (): Promise<User> => {
+  const response = await fetch(`${apiUrl}/api/users/me`, {
+    credentials: 'include', // Send cookies with the request
+  });
+  if (!response.ok) {
+    throw new Error('Network response was not ok when fetching current user');
   }
   return response.json();
 };
@@ -89,6 +101,15 @@ export const useUsers = () => {
   return useQuery({
     queryKey: ['users'],
     queryFn: fetchUsers,
+  });
+};
+
+export const useCurrentUser = () => {
+  return useQuery<User, Error>({
+    queryKey: ['currentUser'] as const,
+    queryFn: fetchCurrentUser,
+    // You might want to add options like staleTime or gcTime (cacheTime in v4) if needed
+    // e.g., staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
 

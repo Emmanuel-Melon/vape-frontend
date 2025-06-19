@@ -117,7 +117,7 @@ export type QuizAttempt = z.infer<typeof QuizAttemptSchema>;
 
 // GET /api/quizzes (Assumed endpoint for listing all quizzes)
 const fetchQuizzes = async (): Promise<Quiz[]> => {
-  const response = await fetch(`${apiUrl}/quizzes`);
+  const response = await fetch(`${apiUrl}/api/quizzes`, { credentials: 'include' });
   if (!response.ok) {
     const errorBody = await response.text();
     throw new Error(`Network response was not ok for fetching quizzes: ${errorBody}`);
@@ -127,7 +127,7 @@ const fetchQuizzes = async (): Promise<Quiz[]> => {
 
 // GET /api/quizzes/:id
 const fetchQuizById = async (id: number | string): Promise<Quiz> => {
-  const response = await fetch(`${apiUrl}/quizzes/${id}`);
+  const response = await fetch(`${apiUrl}/api/quizzes/${id}`, { credentials: 'include' });
   if (!response.ok) {
     const errorBody = await response.text();
     throw new Error(`Network response was not ok for fetching quiz ${id}: ${errorBody}`);
@@ -139,6 +139,7 @@ const fetchQuizById = async (id: number | string): Promise<Quiz> => {
 const createQuiz = async (data: CreateQuizInput): Promise<Quiz> => {
   const validatedData = CreateQuizInputSchema.parse(data);
   const response = await fetch(`${apiUrl}/quizzes`, {
+    credentials: 'include',
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -156,7 +157,8 @@ const createQuiz = async (data: CreateQuizInput): Promise<Quiz> => {
 const submitQuizAnswers = async (data: SubmitQuizAnswersInput): Promise<QuizSubmission> => {
   const validatedData = SubmitQuizAnswersInputSchema.parse(data);
   // The quizId is now part of the 'data' object, so the URL doesn't need it explicitly appended like before.
-  const response = await fetch(`${apiUrl}/quizzes/attempts`, {
+  const response = await fetch(`${apiUrl}/api/quizzes/attempts`, {
+    credentials: 'include',
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -172,7 +174,7 @@ const submitQuizAnswers = async (data: SubmitQuizAnswersInput): Promise<QuizSubm
 
 // GET /api/quiz-attempts/:attemptId
 const fetchQuizAttempt = async (attemptId: number | string): Promise<QuizAttempt> => {
-  const response = await fetch(`${apiUrl}/quiz-attempts/${attemptId}`);
+  const response = await fetch(`${apiUrl}/quiz-attempts/${attemptId}`, { credentials: 'include' });
   if (!response.ok) {
     const errorBody = await response.text();
     throw new Error(`Network response was not ok for fetching quiz attempt ${attemptId}: ${errorBody}`);

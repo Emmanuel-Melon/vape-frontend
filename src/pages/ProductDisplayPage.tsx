@@ -1,10 +1,10 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Factory, DollarSign, Thermometer, Tag, Info, Loader2, AlertTriangle, ChevronLeft } from 'lucide-react';
-import { CloudNavbar } from '../components/CloudNavbar';
-import { MobileNavbar } from '../components/MobileNavbar';
-import { CloudBackground } from '../components/CloudBackground'; 
+import { Factory, DollarSign, Thermometer, Tag, Info, Loader2, AlertTriangle, ChevronLeft, Star, CalendarDays, SlidersHorizontal, Award, Zap, Smile, Briefcase, BatteryCharging, ShieldCheck, Puzzle, Wrench, Gem, CheckCircle, ListChecks } from 'lucide-react';
+import { CloudNavbar } from '../components/layout/CloudNavbar';
+import { MobileNavbar } from '../components/layout/MobileNavbar';
+import { CloudBackground } from '../components/layout/CloudBackground'; 
 import { useIsMobile } from '../hooks/useMediaQuery';
 import { useVaporizerBySlug } from '../hooks/use-vaporizers';
 import { Vaporizer } from '../lib/schemas/vaporizerSchemas';
@@ -15,6 +15,38 @@ const ProductDisplayPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data, isLoading, error, isError } = useVaporizerBySlug(slug);
   const product = data as Vaporizer | undefined;
+
+  interface AttributeScoreItem {
+    icon: React.ElementType;
+    label: string;
+    score: number; // out of 10
+    iconColor?: string;
+  }
+
+  const DUMMY_ATTRIBUTE_SCORES: AttributeScoreItem[] = [
+    { icon: Zap, label: 'Vapor Potency', score: product?.expertScore ? Math.round(parseFloat(product.expertScore) * 0.8) : 7, iconColor: 'text-orange-500' }, // Example: derive from expertScore or default
+    { icon: Smile, label: 'Vapor Comfort', score: 8, iconColor: 'text-lime-500' },
+    { icon: Briefcase, label: 'Portability', score: 9, iconColor: 'text-blue-500' },
+    { icon: BatteryCharging, label: 'Battery Life', score: 6, iconColor: 'text-green-500' },
+    { icon: ShieldCheck, label: 'Build Quality', score: 7, iconColor: 'text-gray-500' },
+    { icon: Puzzle, label: 'Ease Of Use', score: 9, iconColor: 'text-purple-500' },
+    { icon: Wrench, label: 'Maintenance', score: 8, iconColor: 'text-teal-500' },
+    { icon: Gem, label: 'Value for Money', score: product?.msrp ? (parseFloat(product.msrp) < 150 ? 9 : parseFloat(product.msrp) < 250 ? 7 : 5) : 7, iconColor: 'text-amber-500' }, // Example: derive from msrp or default
+  ];
+
+  const renderStars = (ratingString: string | null | undefined, maxStars = 5) => {
+    const rating = ratingString ? parseFloat(ratingString) : 0;
+    const fullStars = Math.floor(rating);
+    const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+    const emptyStars = maxStars - fullStars - halfStar;
+    return (
+      <div className="flex items-center">
+        {[...Array(fullStars)].map((_, i) => <Star key={`full-${i}`} className="h-5 w-5 text-yellow-400 fill-yellow-400" />)}
+        {halfStar === 1 && <Star key="half" className="h-5 w-5 text-yellow-400 fill-yellow-200" /> /* Simple half-star representation */}
+        {[...Array(emptyStars)].map((_, i) => <Star key={`empty-${i}`} className="h-5 w-5 text-gray-300" />)}
+      </div>
+    );
+  };
 
   const mainContentVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -68,101 +100,103 @@ const ProductDisplayPage: React.FC = () => {
         )}
         {!isLoading && !isError && product && (
           <motion.div 
-            className="md:flex md:gap-6 lg:gap-8 items-start"
+            className="bg-gradient-to-br from-slate-50 via-sky-50 to-cyan-50 p-4 sm:p-6 md:p-8 rounded-xl shadow-2xl border-2 border-green-300/70"
             variants={mainContentVariants}
             initial="hidden"
             animate="visible"
           >
-            {/* Floating Image Section */}
-            <motion.div 
-              className="md:w-1/3 md:max-w-sm flex-shrink-0 mb-6 md:mb-0 mx-auto md:mx-0 flex items-center justify-center"
-              variants={itemVariants}
-              whileHover={{ scale: 1.03 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <img 
-                src={product.imageUrl || '/vape.webp'} 
-                alt={product.name} 
-                className="w-full h-auto object-contain max-w-[300px] md:max-w-full md:max-h-[400px]"
-              />
-            </motion.div>
-
-            {/* Textual Details Card (Stylized) */}
-            <motion.div 
-              className="md:flex-1 bg-gradient-to-br from-white to-sky-50 shadow-xl rounded-xl p-6 md:p-8 lg:p-10 border border-sky-100"
-              variants={itemVariants}
-            >
-              {/* Core Info Section (Name, Manufacturer, MSRP) */} 
-              <div className="flex flex-col space-y-3 md:space-y-4 text-center md:text-left mb-6 md:mb-8">
-                <motion.h1 variants={itemVariants} className="text-3xl lg:text-4xl xl:text-5xl font-bold text-slate-800">
-                  {product.name}
-                </motion.h1>
-                
+            <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+              {/* Left Column: Image and Basic Info */}
+              <motion.div className="md:w-1/3 flex flex-col items-center" variants={itemVariants}>
+                <img 
+                  src={product.imageUrl || '/vape.webp'} 
+                  alt={product.name} 
+                  className="w-full max-w-xs md:max-w-sm h-auto object-contain rounded-lg shadow-lg mb-4 border border-slate-200 bg-white p-2"
+                />
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 text-center">{product.name}</h1>
                 {product.manufacturer && (
-                  <motion.div variants={itemVariants} className="flex items-center text-md lg:text-lg text-slate-600 gap-2 justify-center md:justify-start">
-                    <Factory className="text-sky-600 h-5 w-5 flex-shrink-0" />
-                    <span>By {product.manufacturer}</span>
-                  </motion.div>
+                  <p className="text-md text-slate-600 text-center">by {product.manufacturer}</p>
                 )}
-                
                 {product.msrp && (
-                  <motion.div variants={itemVariants} className="flex items-center text-2xl lg:text-3xl font-semibold text-sky-700 gap-2 justify-center md:justify-start">
-                    <DollarSign className="text-sky-600 h-6 lg:h-7 w-6 lg:w-7 flex-shrink-0" />
-                    <span>${product.msrp}</span>
-                    <span className="text-xs lg:text-sm text-slate-500 font-normal">(MSRP)</span>
-                  </motion.div>
+                  <p className="text-2xl font-semibold text-green-600 mt-1 text-center">${product.msrp}</p>
                 )}
-              </div>
+              </motion.div>
 
-              {/* Bottom Section: Description, Attributes, etc. */}
-              <div className="space-y-6 pt-6 border-t border-sky-200">
-                {product.description && (
-                  <motion.div variants={itemVariants} className="prose prose-lg prose-slate max-w-none">
-                    <h2 className="flex items-center text-xl font-semibold text-slate-700 mb-2 gap-2">
-                      <Info className="text-sky-600 h-5 w-5 flex-shrink-0" />
-                      About this Vaporizer
-                    </h2>
-                    <p className="text-slate-600 leading-relaxed">{product.description}</p>
-                  </motion.div>
-                )}
+              {/* Right Column: Details, Scores, etc. */}
+              <motion.div className="md:w-2/3 space-y-6" variants={itemVariants}>
+                <div className="bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-lg shadow-md border border-slate-200">
+                  <div className="flex flex-col sm:flex-row justify-between items-center mb-3">
+                    <h2 className="text-xl font-semibold text-green-700">88% Match</h2> {/* Dummy Match % */}
+                    {renderStars(product.userRating, 5)}
+                  </div>
+                  {product.description && (
+                    <div className='mb-4'>
+                      <h3 className="text-lg font-semibold text-slate-700 mb-1">Why it's perfect for you:</h3>
+                      <p className="text-slate-600 text-sm sm:text-base leading-relaxed">{product.description}</p>
+                    </div>
+                  )}
+                </div>
 
-                {(product.bestFor && product.bestFor.length > 0 || product.heatingMethod) && (
-                  <motion.div variants={itemVariants} className="mt-4 pt-5 border-t border-sky-200 space-y-4">
-                    {product.bestFor && product.bestFor.length > 0 && (
-                      <div>
-                        <h3 className="flex items-center text-lg font-semibold text-slate-700 mb-2 gap-2">
-                          <Tag className="text-sky-600 h-5 w-5 flex-shrink-0" />
-                          Ideal For:
-                        </h3>
-                        <ul className="flex flex-wrap gap-2.5">
-                          {product.bestFor.map((item, index) => (
-                            <motion.li 
-                              key={index} 
-                              className="bg-sky-100 text-sky-800 text-sm font-medium px-3.5 py-1.5 rounded-full shadow-sm border border-sky-200 hover:bg-sky-200 transition-colors cursor-default"
-                              whileHover={{ y: -2 }}
-                            >
-                              {item}
-                            </motion.li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {product.heatingMethod && (
-                      <div>
-                        <h3 className="flex items-center text-lg font-semibold text-slate-700 mb-1 gap-2">
-                          <Thermometer className="text-sky-600 h-5 w-5 flex-shrink-0" />
-                          Heating Method:
-                        </h3>
-                        <p className="text-slate-600 pl-7 text-md">{product.heatingMethod}</p>
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-                <motion.p variants={itemVariants} className="mt-6 text-xs text-slate-400 pt-4 border-t border-sky-100">
+                {/* Attribute Scores Grid */}
+                <div className="bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-lg shadow-md border border-slate-200">
+                  <h3 className="text-lg font-semibold text-slate-700 mb-4 text-center sm:text-left">Performance Breakdown</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {DUMMY_ATTRIBUTE_SCORES.map((attr, index) => (
+                      <motion.div 
+                        key={index} 
+                        className="flex flex-col items-center justify-center text-center p-3 bg-slate-50 rounded-lg shadow-sm border border-slate-200 hover:shadow-md transition-shadow"
+                        variants={itemVariants}
+                      >
+                        <attr.icon className={`h-6 w-6 mb-1.5 ${attr.iconColor || 'text-sky-600'}`} />
+                        <span className="text-xs font-medium text-slate-700">{attr.label}</span>
+                        <span className={`text-sm font-bold ${attr.iconColor || 'text-sky-700'}`}>{attr.score}/10</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Key Features */}
+                  {(product.bestFor && product.bestFor.length > 0 || product.heatingMethod || product.tempControl) && (
+                    <div className="bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-lg shadow-md border border-slate-200">
+                      <h3 className="flex items-center text-lg font-semibold text-slate-700 mb-3 gap-2">
+                        <ListChecks className="text-sky-600 h-5 w-5" />
+                        Key Features
+                      </h3>
+                      <ul className="space-y-1.5 text-sm text-slate-600">
+                        {product.heatingMethod && <li className="flex items-center"><Thermometer size={16} className="mr-2 text-sky-500" /> Heating: {product.heatingMethod}</li>}
+                        {product.tempControl && <li className="flex items-center"><SlidersHorizontal size={16} className="mr-2 text-sky-500" /> Temp Control: {product.tempControl}</li>}
+                        {product.releaseDate && <li className="flex items-center"><CalendarDays size={16} className="mr-2 text-sky-500" /> Released: {new Date(product.releaseDate).toLocaleDateString()}</li>}
+                        {/* You can add more derived or dummy key features here */}
+                        {product.expertScore && <li className="flex items-center"><Award size={16} className="mr-2 text-yellow-500" /> Expert Score: {product.expertScore}/10</li>}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Best For */}
+                  {product.bestFor && product.bestFor.length > 0 && (
+                    <div className="bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-lg shadow-md border border-slate-200">
+                      <h3 className="flex items-center text-lg font-semibold text-slate-700 mb-3 gap-2">
+                        <CheckCircle className="text-green-600 h-5 w-5" />
+                        Best For
+                      </h3>
+                      <ul className="flex flex-wrap gap-2">
+                        {product.bestFor.map((item, index) => (
+                          <li key={index} className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full border border-green-200">
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+                
+                <motion.p variants={itemVariants} className="text-xs text-slate-400 text-center pt-2">
                   Product ID (Slug): {slug}
                 </motion.p>
-              </div>
-            </motion.div>
+
+              </motion.div>
+            </div>
           </motion.div>
         )}
         {!isLoading && !isError && !product && (

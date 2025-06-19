@@ -9,7 +9,7 @@ import { apiUrl } from '../config'; // Use exported apiUrl
  * @returns A promise that resolves to the vaporizer data.
  */
 const fetchVaporizerBySlug = async (slug: string): Promise<Vaporizer> => {
-  const response = await fetch(`${apiUrl}/vaporizers/${slug}`);
+  const response = await fetch(`${apiUrl}/api/vaporizers/${slug}`);
 
   if (!response.ok) {
     if (response.status === 404) {

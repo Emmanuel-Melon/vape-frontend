@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Leaf, Users, Award, Target, Heart, Star, Quote, 
-  CheckCircle, Zap, Shield, TrendingUp, Globe, 
-  MessageCircle, Coffee, Lightbulb, Rocket, 
-  ChevronDown, ChevronUp, HelpCircle
+import {
+  Users, Award, Target, Heart, Star, Quote,
+  Zap, Shield, Globe, MessageCircle, Rocket,
+  ChevronDown, HelpCircle, Lightbulb
 } from 'lucide-react';
-import { CloudBackground } from './CloudBackground';
-import { Footer } from './Footer';
+import { CloudBackground } from '../components/layout/CloudBackground';
+import { Footer } from '../components/layout/Footer';
 
 interface Testimonial {
   id: string;
@@ -246,8 +245,8 @@ export const AboutPage: React.FC = () => {
   const [activeFaqCategory, setActiveFaqCategory] = useState<'all' | 'general' | 'quiz' | 'recommendations' | 'technical' | 'sellers'>('all');
   const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
 
-  const filteredTestimonials = activeTestimonialCategory === 'all' 
-    ? testimonials 
+  const filteredTestimonials = activeTestimonialCategory === 'all'
+    ? testimonials
     : testimonials.filter(t => t.category === activeTestimonialCategory);
 
   const filteredFaqs = activeFaqCategory === 'all'
@@ -273,7 +272,7 @@ export const AboutPage: React.FC = () => {
   return (
     <div className="min-h-screen font-sen relative overflow-hidden">
       <CloudBackground />
-      
+
       <div className="container mx-auto px-4 py-8 max-w-6xl relative z-10">
         {/* Hero Section */}
         <motion.div
@@ -284,7 +283,7 @@ export const AboutPage: React.FC = () => {
         >
           <motion.div
             className="text-6xl mb-6"
-            animate={{ 
+            animate={{
               scale: [1, 1.1, 1],
               rotate: [0, 5, -5, 0]
             }}
@@ -296,7 +295,7 @@ export const AboutPage: React.FC = () => {
             About TryThisVape
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            We're on a mission to help everyone find their perfect vaporizer through AI-powered recommendations, 
+            We're on a mission to help everyone find their perfect vaporizer through AI-powered recommendations,
             expert insights, and a passionate community of cannabis enthusiasts.
           </p>
         </motion.div>
@@ -316,7 +315,7 @@ export const AboutPage: React.FC = () => {
               <h2 className="text-2xl font-bold text-gray-800">Our Mission</h2>
             </div>
             <p className="text-gray-700 leading-relaxed">
-              To democratize access to cannabis vaporization by providing personalized, AI-driven recommendations 
+              To democratize access to cannabis vaporization by providing personalized, AI-driven recommendations
               that help users find devices perfectly suited to their needs, experience level, and preferences.
             </p>
           </div>
@@ -329,7 +328,7 @@ export const AboutPage: React.FC = () => {
               <h2 className="text-2xl font-bold text-gray-800">Our Vision</h2>
             </div>
             <p className="text-gray-700 leading-relaxed">
-              A world where every cannabis user has access to the perfect vaporization experience, supported by 
+              A world where every cannabis user has access to the perfect vaporization experience, supported by
               technology, community knowledge, and expert guidance that makes the complex simple.
             </p>
           </div>
@@ -418,13 +417,12 @@ export const AboutPage: React.FC = () => {
                 </p>
 
                 <div className="mt-4">
-                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                    testimonial.category === 'user' ? 'bg-green-100 text-green-700' :
-                    testimonial.category === 'expert' ? 'bg-blue-100 text-blue-700' :
-                    'bg-purple-100 text-purple-700'
-                  }`}>
-                    {testimonial.category === 'user' ? 'User' : 
-                     testimonial.category === 'expert' ? 'Expert' : 'Seller'}
+                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${testimonial.category === 'user' ? 'bg-green-100 text-green-700' :
+                      testimonial.category === 'expert' ? 'bg-blue-100 text-blue-700' :
+                        'bg-purple-100 text-purple-700'
+                    }`}>
+                    {testimonial.category === 'user' ? 'User' :
+                      testimonial.category === 'expert' ? 'Expert' : 'Seller'}
                   </span>
                 </div>
               </motion.div>
@@ -464,11 +462,10 @@ export const AboutPage: React.FC = () => {
                   <button
                     key={filter.value}
                     onClick={() => setActiveFaqCategory(filter.value as any)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      activeFaqCategory === filter.value
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeFaqCategory === filter.value
                         ? 'bg-green-600 text-white'
                         : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300'
-                    }`}
+                      }`}
                   >
                     {filter.label} ({filter.count})
                   </button>
@@ -500,7 +497,7 @@ export const AboutPage: React.FC = () => {
                         <ChevronDown size={20} className="text-gray-500" />
                       </motion.div>
                     </button>
-                    
+
                     <AnimatePresence>
                       {expandedFaq === faq.id && (
                         <motion.div
@@ -513,13 +510,12 @@ export const AboutPage: React.FC = () => {
                           <div className="px-6 py-4 bg-white border-t border-gray-200">
                             <p className="text-gray-700 leading-relaxed">{faq.answer}</p>
                             <div className="mt-3">
-                              <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                                faq.category === 'general' ? 'bg-blue-100 text-blue-700' :
-                                faq.category === 'quiz' ? 'bg-green-100 text-green-700' :
-                                faq.category === 'recommendations' ? 'bg-purple-100 text-purple-700' :
-                                faq.category === 'technical' ? 'bg-orange-100 text-orange-700' :
-                                'bg-pink-100 text-pink-700'
-                              }`}>
+                              <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${faq.category === 'general' ? 'bg-blue-100 text-blue-700' :
+                                  faq.category === 'quiz' ? 'bg-green-100 text-green-700' :
+                                    faq.category === 'recommendations' ? 'bg-purple-100 text-purple-700' :
+                                      faq.category === 'technical' ? 'bg-orange-100 text-orange-700' :
+                                        'bg-pink-100 text-pink-700'
+                                }`}>
                                 {faq.category.charAt(0).toUpperCase() + faq.category.slice(1)}
                               </span>
                             </div>
@@ -568,7 +564,7 @@ export const AboutPage: React.FC = () => {
           <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-6 border-b border-gray-200">
               <h3 className="text-2xl font-bold text-gray-800 mb-4">More Testimonials</h3>
-              
+
               {/* Category Filter */}
               <div className="flex flex-wrap gap-2">
                 {[
@@ -580,11 +576,10 @@ export const AboutPage: React.FC = () => {
                   <button
                     key={filter.value}
                     onClick={() => setActiveTestimonialCategory(filter.value as any)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      activeTestimonialCategory === filter.value
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTestimonialCategory === filter.value
                         ? 'bg-green-600 text-white'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
+                      }`}
                   >
                     {filter.label} ({filter.count})
                   </button>
@@ -658,7 +653,7 @@ export const AboutPage: React.FC = () => {
                 <h3 className="text-xl font-bold text-gray-800 mb-1">{member.name}</h3>
                 <p className="text-green-600 font-medium mb-3">{member.role}</p>
                 <p className="text-gray-600 text-sm leading-relaxed mb-4">{member.bio}</p>
-                
+
                 <div className="flex flex-wrap justify-center gap-2">
                   {member.expertise.map((skill, skillIndex) => (
                     <span

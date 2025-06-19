@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
-  ArrowLeft, Star, MapPin, Calendar, Award, TrendingUp, 
+  ArrowLeft, Star, MapPin, Calendar, Award, 
   Heart, Download, ShoppingCart, Eye, MessageCircle, 
-  Shield, Verified, Crown, Package, DollarSign, Users
+  Shield, Verified, Crown, Package, Users
 } from 'lucide-react';
 import { CloudBackground } from './CloudBackground';
+import { useAuth } from '../contexts/AuthContext'; // <-- Import useAuth
 
 interface SellerProfile {
   id: string;
@@ -54,183 +55,60 @@ interface SellerProfile {
   }>;
 }
 
-const sellerProfiles: Record<string, SellerProfile> = {
-  'mike-johnson': {
-    id: 'mike-johnson',
-    username: 'VapeGuru_Mike',
-    displayName: 'Mike Johnson',
-    avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200',
-    badge: 'expert',
-    location: 'Denver, CO',
-    joinDate: '2022-03-15',
-    bio: 'Cannabis industry veteran with 8+ years of experience. Specializing in beginner-friendly setups and budget recommendations. Former dispensary manager turned vaping consultant.',
-    stats: {
-      totalSales: 1250,
-      rating: 4.9,
-      reviews: 342,
-      templates: 15,
-      followers: 2840
-    },
-    specialties: ['Beginner Setups', 'Budget Vapes', 'Medical Cannabis', 'Customer Support'],
-    templates: [
-      {
-        id: 'template-1',
-        title: 'Perfect Beginner Setup',
-        description: 'Complete starter kit with everything you need',
-        price: 15,
-        likes: 342,
-        downloads: 1250,
-        category: 'beginner',
-        vaporizer: {
-          name: 'ONE',
-          brand: 'Planet of the Vapes',
-          price: 99,
-          image: 'https://images.pexels.com/photos/7148621/pexels-photo-7148621.jpeg?auto=compress&cs=tinysrgb&w=300'
-        }
-      },
-      {
-        id: 'template-7',
-        title: 'Medical Micro-Dosing Guide',
-        description: 'Precise dosing for medical patients',
-        price: 20,
-        likes: 189,
-        downloads: 567,
-        category: 'medical',
-        vaporizer: {
-          name: 'ArGo',
-          brand: 'Arizer',
-          price: 199,
-          image: 'https://images.pexels.com/photos/7148621/pexels-photo-7148621.jpeg?auto=compress&cs=tinysrgb&w=300'
-        }
-      }
-    ],
-    products: [
-      {
-        id: 'prod-1',
-        name: 'Planet of the Vapes ONE',
-        brand: 'Planet of the Vapes',
-        price: 89,
-        originalPrice: 99,
-        image: 'https://images.pexels.com/photos/7148621/pexels-photo-7148621.jpeg?auto=compress&cs=tinysrgb&w=300',
-        category: 'Portable Vaporizer',
-        inStock: true,
-        condition: 'new',
-        description: 'Brand new, sealed in box. Perfect for beginners with dosing capsules included.'
-      },
-      {
-        id: 'prod-2',
-        name: 'Arizer ArGo',
-        brand: 'Arizer',
-        price: 179,
-        originalPrice: 199,
-        image: 'https://images.pexels.com/photos/7148621/pexels-photo-7148621.jpeg?auto=compress&cs=tinysrgb&w=300',
-        category: 'Portable Vaporizer',
-        inStock: true,
-        condition: 'like-new',
-        description: 'Lightly used, excellent condition. Includes all original accessories plus extra stems.'
-      },
-      {
-        id: 'prod-3',
-        name: 'Dosing Capsule Set (40pc)',
-        brand: 'S&B',
-        price: 25,
-        image: 'https://images.pexels.com/photos/7148621/pexels-photo-7148621.jpeg?auto=compress&cs=tinysrgb&w=300',
-        category: 'Accessories',
-        inStock: true,
-        condition: 'new',
-        description: 'Official Storz & Bickel dosing capsules. Perfect for precise dosing and easy cleanup.'
-      }
-    ]
-  },
-  'sarah-chen': {
-    id: 'sarah-chen',
-    username: 'FlavorMaster_Sarah',
-    displayName: 'Sarah Chen',
-    avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=200',
-    badge: 'verified',
-    location: 'Portland, OR',
-    joinDate: '2021-08-22',
-    bio: 'Flavor enthusiast and cannabis sommelier. I specialize in convection vaporizers and terpene preservation. Certified cannabis consultant with a passion for education.',
-    stats: {
-      totalSales: 890,
-      rating: 4.8,
-      reviews: 234,
-      templates: 12,
-      followers: 1950
-    },
-    specialties: ['Flavor Optimization', 'Convection Vapes', 'Terpene Education', 'Premium Devices'],
-    templates: [
-      {
-        id: 'template-2',
-        title: 'Flavor Chaser\'s Dream',
-        description: 'Ultimate flavor experience setup',
-        price: 25,
-        likes: 567,
-        downloads: 890,
-        category: 'advanced',
-        vaporizer: {
-          name: 'TinyMight 2',
-          brand: 'TinyMight',
-          price: 349,
-          image: 'https://images.pexels.com/photos/7148621/pexels-photo-7148621.jpeg?auto=compress&cs=tinysrgb&w=300'
-        }
-      }
-    ],
-    products: [
-      {
-        id: 'prod-4',
-        name: 'TinyMight 2',
-        brand: 'TinyMight',
-        price: 329,
-        originalPrice: 349,
-        image: 'https://images.pexels.com/photos/7148621/pexels-photo-7148621.jpeg?auto=compress&cs=tinysrgb&w=300',
-        category: 'Portable Vaporizer',
-        inStock: true,
-        condition: 'new',
-        description: 'Authentic TinyMight 2 with warranty. Includes custom wooden stems and cooling unit.'
-      },
-      {
-        id: 'prod-5',
-        name: 'Glass Stem Collection',
-        brand: 'Custom',
-        price: 45,
-        image: 'https://images.pexels.com/photos/7148621/pexels-photo-7148621.jpeg?auto=compress&cs=tinysrgb&w=300',
-        category: 'Accessories',
-        inStock: true,
-        condition: 'new',
-        description: 'Handcrafted borosilicate glass stems for enhanced flavor. Set of 3 different lengths.'
-      }
-    ]
-  }
-};
-
 export const SellerProfilePage: React.FC = () => {
-  const { sellerId } = useParams<{ sellerId: string }>();
+  const { user: currentUser, isAuthenticated, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'templates' | 'products'>('templates');
-  
-  const seller = sellerId ? sellerProfiles[sellerId] : null;
 
-  if (!seller) {
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center font-sen relative overflow-hidden">
+        <CloudBackground />
+        <p className="text-xl text-gray-600 relative z-10">Loading your profile...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !currentUser) {
     return (
       <div className="min-h-screen font-sen relative overflow-hidden">
         <CloudBackground />
-        <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
-          <div className="text-center py-16">
-            <div className="text-6xl mb-6">❌</div>
-            <h2 className="text-2xl font-bold text-gray-600 mb-3">Seller Not Found</h2>
-            <p className="text-gray-500 mb-6">The seller profile you're looking for doesn't exist.</p>
-            <button
-              onClick={() => navigate('/explore')}
-              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            >
-              Back to Explore
-            </button>
-          </div>
+        <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10 text-center">
+          <h2 className="text-2xl font-bold text-gray-700 mb-4">Profile Access Denied</h2>
+          <p className="text-gray-600 mb-6">Please log in to view your profile page.</p>
+          <button
+            onClick={() => navigate('/auth')} // Assuming '/auth' is your login page route
+            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            Go to Login Page
+          </button>
         </div>
       </div>
     );
   }
+
+  // Map currentUser to the SellerProfile structure
+  // This 'seller' object now represents the currently logged-in user's profile data.
+  const seller: SellerProfile = {
+    id: currentUser.id,
+    username: currentUser.username,
+    displayName: currentUser.username, // Placeholder: consider adding a displayName to your User model or allow editing
+    avatar: `https://avatar.iran.liara.run/public/boy?username=${currentUser.username}`, // Generic placeholder avatar
+    badge: currentUser.role === 'ADMIN' ? 'expert' : 'verified', // Example: derive badge from role
+    location: 'Your Location', // Placeholder: This would ideally come from user's profile data
+    joinDate: currentUser.createdAt, // Use createdAt from the user object
+    bio: 'Welcome to your profile! You can update your bio soon.', // Placeholder bio
+    stats: { // These are placeholders as this data is not in the basic currentUser object
+      totalSales: 0,
+      rating: 0.0,
+      reviews: 0,
+      templates: 0, // Will be populated if you fetch user's templates
+      followers: 0,
+    },
+    specialties: ['Vaping Enthusiast'], // Placeholder specialties
+    templates: [], // Placeholder: Fetch user's templates separately
+    products: [],  // Placeholder: Fetch user's products separately
+  };
 
   const getBadgeColor = (badge: string) => {
     switch (badge) {
@@ -375,6 +253,15 @@ export const SellerProfilePage: React.FC = () => {
 
               {/* Action Buttons */}
               <div className="flex gap-3">
+                {isAuthenticated && currentUser && currentUser.username === seller.username && (
+                  <button 
+                    onClick={() => console.log('Navigate to edit profile page for:', seller.username)} 
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <Users size={16} /> {/* TODO: Replace with a more appropriate icon like Edit2 */} 
+                    Edit Profile
+                  </button>
+                )}
                 <button className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
                   <MessageCircle size={16} />
                   Message

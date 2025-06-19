@@ -3,23 +3,25 @@ import VaporizerQuiz from './components/quiz/VaporizerQuiz';
 import { HomePage } from './components/HomePage';
 import { SavedPage } from './components/SavedPage';
 import { ExplorePage } from './components/ExplorePage';
-import { ResultDetailPage } from './components/ResultDetailPage';
-import { SellerProfilePage } from './components/SellerProfilePage';
-import { StoreSetupPage } from './components/StoreSetupPage';
-import { AuthPage } from './components/AuthPage';
-import { AboutPage } from './components/AboutPage';
+import { ResultDetailPage } from './pages/ResultDetailPage';
+import { SellerProfilePage } from './pages/SellerProfilePage';
+import { StoreSetupPage } from './pages/StoreSetupPage';
+import { AboutPage } from './pages/AboutPage';
 import { TemplateViewPage } from './components/TemplateViewPage';
-import { NotFoundPage } from './components/NotFoundPage';
+import { NotFoundPage } from './components/layout/NotFoundPage';
 import ProductDisplayPage from './pages/ProductDisplayPage'; // Added for product display
-import { CloudNavbar } from './components/CloudNavbar';
-import { MobileNavbar } from './components/MobileNavbar';
+import { CloudNavbar } from './components/layout/CloudNavbar';
+import { MobileNavbar } from './components/layout/MobileNavbar';
 import { useIsMobile } from './hooks/useMediaQuery';
+import  AuthPage  from './pages/AuthPage';
+import { AuthProvider } from './contexts/AuthContext'; // <-- Import AuthProvider
 
 function App() {
   const isMobile = useIsMobile();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
+    <AuthProvider> 
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
       <Routes>
         {/* Auth routes without navbar */}
         <Route path="/auth" element={<AuthPage />} />
@@ -30,6 +32,7 @@ function App() {
             <CloudNavbar />
             <div className={`${isMobile ? 'pb-20' : 'pt-20'}`}>
               <Routes>
+                <Route path="/auth" element={<AuthPage />} />
                 <Route path="/" element={<HomePage />} />
                 <Route path="/quiz" element={<VaporizerQuiz quizId={1} />} />
                 <Route path="/saved" element={<SavedPage />} />
@@ -38,6 +41,7 @@ function App() {
                 <Route path="/template/:templateId" element={<TemplateViewPage />} />
                 <Route path="/results/:id" element={<ResultDetailPage />} />
                 <Route path="/seller/:sellerId" element={<SellerProfilePage />} />
+                <Route path="/my-profile" element={<SellerProfilePage />} />
                 <Route path="/store-setup" element={<StoreSetupPage />} />
                 <Route path="/products/:slug" element={<ProductDisplayPage />} />
                 {/* 404 catch-all route */}
@@ -49,6 +53,7 @@ function App() {
         } />
       </Routes>
     </div>
+    </AuthProvider>
   );
 }
 
