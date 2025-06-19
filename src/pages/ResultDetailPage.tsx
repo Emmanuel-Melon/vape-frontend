@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, Award, Battery, Zap, Shield, Wrench, DollarSign, Calendar, User } from 'lucide-react';
-import { CloudBackground } from './CloudBackground';
+import { CloudBackground } from '../components/layout/CloudBackground';
 
 // Dummy data - in a real app, this would come from a data store or API
 const dummyResults = {

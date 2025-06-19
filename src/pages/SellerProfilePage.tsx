@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
-  ArrowLeft, Star, MapPin, Calendar, Award, 
+  ArrowLeft, Star, MapPin, Calendar, 
   Heart, Download, ShoppingCart, Eye, MessageCircle, 
-  Shield, Verified, Crown, Package, Users
+  Shield, Package, Users
 } from 'lucide-react';
-import { CloudBackground } from './CloudBackground';
+import { CloudBackground } from '../components/layout/CloudBackground';
 import { useAuth } from '../contexts/AuthContext'; // <-- Import useAuth
+import { getBadgeColor, getBadgeIcon, getBadgeLabel, getConditionColor } from '../utils/style-helpers';
 
 interface SellerProfile {
   id: string;
@@ -110,42 +111,7 @@ export const SellerProfilePage: React.FC = () => {
     products: [],  // Placeholder: Fetch user's products separately
   };
 
-  const getBadgeColor = (badge: string) => {
-    switch (badge) {
-      case 'verified': return 'bg-blue-500';
-      case 'expert': return 'bg-purple-500';
-      case 'top-seller': return 'bg-yellow-500';
-      default: return 'bg-gray-500';
-    }
-  };
 
-  const getBadgeIcon = (badge: string) => {
-    switch (badge) {
-      case 'verified': return <Verified size={16} />;
-      case 'expert': return <Award size={16} />;
-      case 'top-seller': return <Crown size={16} />;
-      default: return null;
-    }
-  };
-
-  const getBadgeLabel = (badge: string) => {
-    switch (badge) {
-      case 'verified': return 'Verified Seller';
-      case 'expert': return 'Community Expert';
-      case 'top-seller': return 'Top Seller';
-      default: return '';
-    }
-  };
-
-  const getConditionColor = (condition: string) => {
-    switch (condition) {
-      case 'new': return 'bg-green-100 text-green-800';
-      case 'like-new': return 'bg-blue-100 text-blue-800';
-      case 'good': return 'bg-yellow-100 text-yellow-800';
-      case 'fair': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   return (
     <div className="min-h-screen font-sen relative overflow-hidden">

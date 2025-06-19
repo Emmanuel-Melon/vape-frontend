@@ -3,9 +3,9 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Star, Calendar, Trash2, Edit3, Check, X, Search, SortDesc, Eye } from 'lucide-react';
 import { SavedQuizResult } from '../types/vaporizer';
-import { CloudBackground } from './CloudBackground';
-import { Pagination } from './Pagination';
-import { Footer } from './Footer';
+import { CloudBackground } from '../components/layout/CloudBackground';
+import { Pagination } from '../components/Pagination';
+import { Footer } from '../components/layout/Footer';
 
 // Dummy saved results with stock images
 const dummyResults: SavedQuizResult[] = [
@@ -42,6 +42,7 @@ const dummyResults: SavedQuizResult[] = [
         heatingMethod: 'convection',
         type: 'portable',
         ratings: {
+          maintenanceRequired: 5,
           vaporPotency: 10,
           vaporComfort: 7,
           portability: 8,
@@ -111,6 +112,7 @@ const dummyResults: SavedQuizResult[] = [
         heatingMethod: 'convection' as any,
         type: 'portable' as any,
         ratings: {
+          maintenanceRequired: Math.floor(Math.random() * 10) + 1,
           vaporPotency: Math.floor(Math.random() * 10) + 1,
           vaporComfort: Math.floor(Math.random() * 10) + 1,
           portability: Math.floor(Math.random() * 10) + 1,

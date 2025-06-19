@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { PageContainer } from './layout/PageContainer';
-import { SectionHeader } from './layout/SectionHeader';
+import { PageContainer } from '../components/layout/PageContainer';
+import { SectionHeader } from '../components/layout/SectionHeader';
 import { ArrowRight } from 'lucide-react';
 
 export const HomePage: React.FC = () => {

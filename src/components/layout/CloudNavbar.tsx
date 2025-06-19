@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { BookOpen, Leaf, User, Settings, LogOut, ChevronDown, Compass, Store, MessageCircle, Heart, ExternalLink, Menu, X, Info, LogIn } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { useIsMobile } from '../hooks/useMediaQuery';
+import { useAuth } from '../../contexts/AuthContext';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 
 export const CloudNavbar: React.FC = () => {
   const navigate = useNavigate();

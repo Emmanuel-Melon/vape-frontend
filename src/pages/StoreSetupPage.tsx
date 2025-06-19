@@ -5,7 +5,8 @@ import {
   DollarSign, Package, Star, Shield, CheckCircle, 
   AlertCircle, Info, Plus, X, Edit3, Save
 } from 'lucide-react';
-import { CloudBackground } from './CloudBackground';
+import { CloudBackground } from '../components/layout/CloudBackground';
+import { getConditionColor } from '../utils/style-helpers';
 
 interface StoreProfile {
   displayName: string;
@@ -162,15 +163,7 @@ export const StoreSetupPage: React.FC = () => {
     }
   };
 
-  const getConditionColor = (condition: string) => {
-    switch (condition) {
-      case 'new': return 'bg-green-100 text-green-800';
-      case 'like-new': return 'bg-blue-100 text-blue-800';
-      case 'good': return 'bg-yellow-100 text-yellow-800';
-      case 'fair': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
+
 
   const handleAddSpecialty = (specialty: string) => {
     if (!storeProfile.specialties.includes(specialty)) {

@@ -1,13 +1,13 @@
 import { Routes, Route } from 'react-router-dom';
 import VaporizerQuiz from './components/quiz/VaporizerQuiz';
-import { HomePage } from './components/HomePage';
-import { SavedPage } from './components/SavedPage';
-import { ExplorePage } from './components/ExplorePage';
+import { HomePage } from './pages/HomePage';
+import { SavedPage } from './pages/SavedPage';
+import { ExplorePage } from './pages/ExplorePage';
 import { ResultDetailPage } from './pages/ResultDetailPage';
 import { SellerProfilePage } from './pages/SellerProfilePage';
 import { StoreSetupPage } from './pages/StoreSetupPage';
 import { AboutPage } from './pages/AboutPage';
-import { TemplateViewPage } from './components/TemplateViewPage';
+import { TemplateViewPage } from './pages/TemplateViewPage';
 import { NotFoundPage } from './components/layout/NotFoundPage';
 import ProductDisplayPage from './pages/ProductDisplayPage'; // Added for product display
 import { CloudNavbar } from './components/layout/CloudNavbar';

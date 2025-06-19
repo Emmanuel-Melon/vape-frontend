@@ -6,8 +6,9 @@ import {
   MessageCircle, Eye, ShoppingCart, Share2, Bookmark,
   ThumbsUp, Filter, SortDesc, ExternalLink, CheckCircle
 } from 'lucide-react';
-import { CloudBackground } from './CloudBackground';
-import { TemplateDiscussion } from './TemplateDiscussion';
+import { CloudBackground } from '../components/layout/CloudBackground';
+import { TemplateDiscussion } from '../components/TemplateDiscussion';
+import { getBadgeColor, getBadgeIcon, getCategoryColor } from '../utils/style-helpers';
 
 interface TemplateDetails {
   id: string;
@@ -207,35 +208,7 @@ export const TemplateViewPage: React.FC = () => {
   // In a real app, fetch template data based on templateId
   const template = mockTemplate;
 
-  const getBadgeColor = (badge: string) => {
-    switch (badge) {
-      case 'verified': return 'bg-blue-500';
-      case 'expert': return 'bg-purple-500';
-      case 'top-seller': return 'bg-yellow-500';
-      default: return 'bg-gray-500';
-    }
-  };
 
-  const getBadgeIcon = (badge: string) => {
-    switch (badge) {
-      case 'verified': return '✓';
-      case 'expert': return '🎓';
-      case 'top-seller': return '⭐';
-      default: return '';
-    }
-  };
-
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'beginner': return 'bg-green-100 text-green-800';
-      case 'advanced': return 'bg-purple-100 text-purple-800';
-      case 'budget': return 'bg-blue-100 text-blue-800';
-      case 'premium': return 'bg-yellow-100 text-yellow-800';
-      case 'medical': return 'bg-red-100 text-red-800';
-      case 'recreational': return 'bg-pink-100 text-pink-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   const getImportanceColor = (importance: string) => {
     switch (importance) {
