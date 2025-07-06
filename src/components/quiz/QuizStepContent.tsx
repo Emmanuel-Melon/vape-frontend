@@ -1,192 +1,194 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { z } from 'zod';
-import { QuestionResponseSchema } from '../../hooks/use-quizzes';
-import { RadioGroup } from '../RadioGroup';
-import { CheckboxGroup } from '../CheckboxGroup';
-import { RangeSlider } from '../RangeSlider';
-import { RankOrderList } from '../RankOrderList';
-import { educationalContent } from '../../data/quizContent'; // Import educational content
-
-// Define types locally using zod infer
-export type QuestionDisplay = z.infer<typeof QuestionResponseSchema>;
-
-// Explicitly define the schema for the 'answer' payload part
-const AnswerObjectSchema = z.object({
-  selectedOptionValue: z.string().optional(),
-  selectedOptionValues: z.array(z.string()).optional(),
-  rankedOptions: z.array(z.object({
-    optionValue: z.string(),
-    rank: z.number(),
-  })).optional(),
-  rangeValue: z.number().optional(),
-});
-export type AnswerPayload = z.infer<typeof AnswerObjectSchema>;
+import { QuestionDisplay, QuizAnswer } from './VaporizerQuiz'; // Import types from VaporizerQuiz
+import { cn } from '../../lib/utils'; // For conditional class names
 
 interface QuizStepContentProps {
   question: QuestionDisplay;
-  currentAnswer: AnswerPayload | undefined;
-  onAnswerChange: (answerPayload: Partial<AnswerPayload>) => void;
+  onAnswer: (answer: QuizAnswer) => void;
   animationDirection: 'next' | 'previous' | 'initial';
+  selectedAnswer: QuizAnswer | undefined;
 }
-
-interface EducationalTip {
-  title: string;
-  content: string;
-  bgColor: string;
-  textColor: string;
-  titleColor: string;
-}
-
-const getEducationalContentForQuestion = (
-  question: QuestionDisplay,
-  currentAnswer: AnswerPayload | undefined
-): EducationalTip | null => {
-  let topic: keyof typeof educationalContent | null = null;
-  let answerValue: string | undefined = currentAnswer?.selectedOptionValue;
-
-  // Placeholder logic to determine topic based on question text
-  // This should be refined based on how questions are categorized in your API data
-  const questionTextLower = question.text.toLowerCase();
-  if (questionTextLower.includes('experience')) {
-    topic = 'experience';
-  } else if (questionTextLower.includes('how often do you plan to use it')) {
-    topic = 'usage';
-  } else if (questionTextLower.includes('where will you primarily use it')) {
-    topic = 'portability';
-  }
-
-  // Handle specific answer value mapping if needed (e.g., 'pocket-size' to 'portable' for tips)
-  if (topic === 'portability' && answerValue === 'pocket-size') {
-    answerValue = 'portable'; // Use 'portable' tip for 'pocket-size' answers
-  }
-
-  if (topic && answerValue && educationalContent[topic] && (educationalContent[topic] as any)[answerValue]) {
-    const contentString = (educationalContent[topic] as any)[answerValue];
-    return {
-      title: "💡 Pro Tip!",
-      content: contentString,
-      bgColor: "bg-blue-50",
-      textColor: "text-blue-700",
-      titleColor: "text-blue-800",
-    };
-  }
-
-  return null;
-};
 
 export const QuizStepContent: React.FC<QuizStepContentProps> = ({
   question,
-  currentAnswer,
-  onAnswerChange,
+  onAnswer,
   animationDirection,
+  selectedAnswer,
 }) => {
-  const renderStepSpecificContent = () => {
-    const { type, text, subtitle, options, rangeMin, rangeMax, rangeStep, rangeDefault } = question;
-
-    return (
-      <div className="space-y-6">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-black dark:text-gray-100 mb-4">
-            {text}
-          </h2>
-          {subtitle && (
-            <p className="text-black dark:text-gray-300 text-lg">
-              {subtitle}
-            </p>
-          )}
-        </div>
-
-        {type === 'WELCOME' && (
-          <div className="text-center text-gray-700 dark:text-gray-300">
-            <p>Click next to begin!</p>
-          </div>
-        )}
-
-        {type === 'SINGLE_SELECT' && options && (
-          <RadioGroup
-            options={options.map(opt => ({ 
-              label: opt.label, 
-              value: opt.value, 
-              description: opt.description 
-            }))}
-            value={currentAnswer?.selectedOptionValue || ''}
-            onChange={(value) => onAnswerChange({ selectedOptionValue: value })}
-            name={question.id.toString()}
-          />
-        )}
-
-        {type === 'MULTI_SELECT' && options && (
-          <CheckboxGroup
-            options={options.map(opt => ({ 
-              label: opt.label, 
-              value: opt.value, 
-              description: opt.description 
-            }))}
-            selectedValues={currentAnswer?.selectedOptionValues || []}
-            onChange={(values) => onAnswerChange({ selectedOptionValues: values })}
-            name={question.id.toString()}
-          />
-        )}
-
-        {type === 'RANKED_SELECT' && options && (
-          <RankOrderList
-            options={options.map(opt => ({ id: opt.value, content: opt.label }))}
-            rankedItems={(
-              currentAnswer?.rankedOptions
-                ?.slice()
-                .sort((a, b) => a.rank - b.rank)
-                .map(item => item.optionValue)
-            ) || options.map(opt => opt.value)}
-            onChange={(newRankedValues) => {
-              const newRankedOptions = newRankedValues.map((optionValue, index) => ({
-                optionValue,
-                rank: index + 1,
-              }));
-              onAnswerChange({ rankedOptions: newRankedOptions });
-            }}
-            name={question.id.toString()}
-          />
-        )}
-
-        {type === 'RANGE_SLIDER' && (
-          <RangeSlider
-            min={rangeMin ?? 0}
-            max={rangeMax ?? 100}
-            step={rangeStep ?? 1}
-            value={currentAnswer?.rangeValue ?? rangeDefault ?? rangeMin ?? 0}
-            onChange={(value) => onAnswerChange({ rangeValue: value })}
-            name={question.id.toString()}
-            showValue={true}
-          />
-        )}
-      </div>
-    );
+  const variants = {
+    enter: (direction: string) => ({
+      x: direction === 'next' ? 100 : direction === 'previous' ? -100 : 0,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction: string) => ({
+      x: direction === 'next' ? -100 : direction === 'previous' ? 100 : 0,
+      opacity: 0,
+    }),
   };
 
-  const tip = getEducationalContentForQuestion(question, currentAnswer);
+  const handleSingleSelectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    const selectedOption = question?.options?.find(opt => opt.value === value);
+    if (selectedOption) {
+      onAnswer({ questionId: question.id, selectedOptionValue: value, optionId: selectedOption.id });
+    }
+  };
+
+  const handleMultiSelectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const optionValue = event.target.value;
+    const checked = event.target.checked;
+
+    let currentSelectedValues: string[] = [];
+    if (selectedAnswer?.selectedOptionValues) {
+      if (Array.isArray(selectedAnswer.selectedOptionValues)) {
+        currentSelectedValues = selectedAnswer.selectedOptionValues as string[];
+      } else if (typeof selectedAnswer.selectedOptionValues === 'string' && selectedAnswer.selectedOptionValues.length > 0) {
+        // Fallback if it's somehow a string already (e.g. from older data or incorrect initial state)
+        currentSelectedValues = selectedAnswer.selectedOptionValues.split(',');
+      }
+    }
+
+    let newValues: string[];
+    if (checked) {
+      // Add value if checked, ensuring no duplicates if user clicks rapidly (though native checkbox handles this)
+      newValues = Array.from(new Set([...currentSelectedValues, optionValue]));
+    } else {
+      newValues = currentSelectedValues.filter(val => val !== optionValue);
+    }
+    onAnswer({ questionId: question.id, selectedOptionValues: newValues, optionId: null }); // Pass as string[]
+  };
+  
+  const handleRangeSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    onAnswer({ questionId: question.id, rangeValue: value, optionId: null });
+  };
+
+  // Helper to check if a multi-select option is selected
+  const isMultiOptionSelected = (optionValue: string): boolean => {
+    if (!selectedAnswer || !selectedAnswer.selectedOptionValues) {
+    return false;
+  }
+
+  // At this point, selectedAnswer.selectedOptionValues is known to be (string[] | string)
+  // due to the schema change and the guard above.
+  if (Array.isArray(selectedAnswer.selectedOptionValues)) {
+    // selectedOptionValues is string[]
+    return selectedAnswer.selectedOptionValues.includes(optionValue);
+  } else {
+    // If it's not an array, and its type is (string[] | string), it MUST be a string here.
+    // TypeScript should infer selectedAnswer.selectedOptionValues as 'string'.
+    return selectedAnswer.selectedOptionValues.split(',').includes(optionValue);
+  }
+  };
 
   return (
     <motion.div
-      key={question.id}
-      initial={{ opacity: 0, x: animationDirection === 'next' ? 100 : animationDirection === 'previous' ? -100 : 0 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: animationDirection === 'next' ? -100 : animationDirection === 'previous' ? 100 : 0 }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="flex-grow flex flex-col justify-between"
+      custom={animationDirection}
+      variants={variants}
+      initial="enter"
+      animate="center"
+      exit="exit"
+      transition={{ type: 'spring', stiffness: 300, damping: 30, duration: 0.3 }}
+      className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 md:p-8 min-h-[400px] flex flex-col justify-between"
     >
-      <div>{renderStepSpecificContent()}</div>
-      {tip && (
-        <motion.div 
-          className={`mt-8 p-6 rounded-xl border border-opacity-20 ${tip.bgColor}`}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }} // Added exit animation from old.tsx
-          transition={{ duration: 0.3 }} // Removed delay from old.tsx
-        >
-          <h3 className={`font-semibold mb-2 ${tip.titleColor}`}>{tip.title}</h3>
-          <p className={tip.textColor}>{tip.content}</p>
-        </motion.div>
+      <div>
+        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2 text-center">{question.text}</h2>
+        {question.description && (
+          <p className="text-sm md:text-base text-slate-600 mb-6 text-center">{question.description}</p>
+        )}
+        <div className="space-y-4">
+          {question.type === 'WELCOME' && (
+            <div className="text-center">
+              <p className="text-lg text-slate-700">Let's get started!</p>
+              {/* The WELCOME step usually doesn't have an input, but if it needed one, it would go here */}
+            </div>
+          )}
+          {question.type === 'SINGLE_SELECT' && (
+            <div role="radiogroup" className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {question?.options?.map((option) => (
+                <label
+                  key={option.id}
+                  htmlFor={`option-${option.id}`}
+                  className={cn(
+                    "flex flex-col items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ease-in-out",
+                    selectedAnswer?.selectedOptionValue === option.value
+                      ? "bg-sky-500 border-sky-600 text-white shadow-lg scale-105"
+                      : "bg-white hover:bg-sky-50 hover:border-sky-300 border-slate-200 text-slate-700"
+                  )}
+                >
+                  <input
+                    type="radio"
+                    id={`option-${option.id}`}
+                    name={`question-${question.id}`}
+                    value={option.value}
+                    checked={selectedAnswer?.selectedOptionValue === option.value}
+                    onChange={handleSingleSelectChange}
+                    className="sr-only"
+                  />
+                  <span className="text-sm font-semibold">{option.label}</span>
+                  {option.description && <span className="text-xs mt-1">{option.description}</span>}
+                </label>
+              ))}
+            </div>
+          )}
+          {question.type === 'MULTI_SELECT' && (
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {question?.options?.map((option) => (
+                <label
+                  key={option.id}
+                  htmlFor={`option-${option.id}`}
+                  className={cn(
+                    "flex items-center space-x-3 p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ease-in-out",
+                    isMultiOptionSelected(option.value)
+                      ? "bg-sky-500 border-sky-600 text-white shadow-lg scale-105"
+                      : "bg-white hover:bg-sky-50 hover:border-sky-300 border-slate-200 text-slate-700"
+                  )}
+                >
+                  <input
+                    type="checkbox"
+                    id={`option-${option.id}`}
+                    value={option.value}
+                    checked={isMultiOptionSelected(option.value)}
+                    onChange={handleMultiSelectChange}
+                    className="form-checkbox h-5 w-5 text-sky-600 transition duration-150 ease-in-out rounded border-gray-300 focus:ring-sky-500"
+                  />
+                  <span className="text-sm font-semibold">{option.label}</span>
+                </label>
+              ))}
+            </div>
+          )}
+          {question.type === 'RANGE_SLIDER' && question.rangeMin !== undefined && question.rangeMax !== undefined && (
+            <div className="pt-4">
+              <input
+                type="range"
+                min={question.rangeMin}
+                max={question.rangeMax}
+                step={question.rangeStep || 1}
+                value={Number(selectedAnswer?.rangeValue) || question.rangeDefault || question.rangeMin}
+                onChange={handleRangeSliderChange}
+                className="w-full h-2 bg-sky-200 rounded-lg appearance-none cursor-pointer accent-sky-500"
+              />
+              <p className="text-center text-lg font-semibold text-sky-600 mt-4">
+                {selectedAnswer?.rangeValue || question.rangeDefault || question.rangeMin}
+                {question.unit && <span className="ml-1 text-sm text-slate-500">{question.unit}</span>}
+              </p>
+            </div>
+          )}
+          {question.type === 'RANKED_SELECT' && (
+            <p className="text-center text-slate-500 italic">Ranked select UI (drag and drop) not yet implemented.</p>
+          )}
+        </div>
+      </div>
+      {question?.educationalTip && (
+        <div className="mt-6 p-4 bg-sky-50 rounded-lg border border-sky-200">
+          <h4 className="font-semibold text-sky-700 mb-1">💡 Quick Tip</h4>
+          <p className="text-xs text-slate-600">{question?.educationalTip}</p>
+        </div>
       )}
     </motion.div>
   );

@@ -1,90 +1,54 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, CheckCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface QuizNavigationProps {
-  currentStepIndex: number;
-  stepsLength: number;
-  canProceed: () => boolean;
-  handlePrevious: () => void;
-  handleNext: () => void;
-  isMobile: boolean;
+  onNext: () => void;
+  onPrevious: () => void;
+  isNextDisabled: boolean;
+  isPreviousDisabled: boolean;
+  isSubmitting: boolean;
+  isFinalQuestion: boolean;
 }
 
 export const QuizNavigation: React.FC<QuizNavigationProps> = ({
-  currentStepIndex,
-  stepsLength,
-  canProceed,
-  handlePrevious,
-  handleNext,
-  isMobile,
+  onNext,
+  onPrevious,
+  isNextDisabled,
+  isPreviousDisabled,
+  isSubmitting,
+  isFinalQuestion,
 }) => {
   return (
-    <>
-      {/* Desktop Side Arrows */}
-      {!isMobile && currentStepIndex > 0 && (
+    <div className={`flex ${isFinalQuestion ? 'justify-end' : 'justify-between'} items-center mt-8`}>
+      {!isFinalQuestion && (
         <motion.button
-          onClick={handlePrevious}
-          className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 w-12 h-12 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center text-gray-600 hover:text-gray-800"
-          style={{ marginLeft: '-64px' }} // Adjust as needed for spacing from the main content card
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }} // Added exit animation
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }} // Adjusted whileTap scale
+          onClick={onPrevious}
+          disabled={isPreviousDisabled || isSubmitting}
+          className="flex items-center px-4 py-2 text-sm font-medium text-slate-600 bg-white rounded-lg border border-slate-300 hover:bg-slate-100 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          whileHover={{ scale: isPreviousDisabled || isSubmitting ? 1 : 1.05 }}
+          whileTap={{ scale: isPreviousDisabled || isSubmitting ? 1 : 0.95 }}
         >
-          <ChevronLeft size={24} />
-        </motion.button>
-      )}
-      {!isMobile && (
-        <motion.button
-          onClick={handleNext}
-          disabled={!canProceed()}
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ marginRight: '-64px' }} // Adjust as needed
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 20 }} // Added exit animation
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }} // Adjusted whileTap scale
-        >
-          {currentStepIndex === stepsLength - 1 ? <Search size={24} /> : <ChevronRight size={24} />}
+          <ChevronLeft className="w-4 h-4 mr-2" />
+          Previous
         </motion.button>
       )}
 
-      {/* Mobile Bottom Navigation */}
-      <AnimatePresence>
-        {isMobile && (
-          <motion.div 
-            className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md p-4 border-t border-gray-200 shadow-top-lg z-50 flex justify-between items-center"
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          >
-            {currentStepIndex > 0 ? (
-              <button
-                onClick={handlePrevious}
-                className="flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all bg-white text-gray-700 hover:bg-gray-50 shadow-md hover:shadow-lg"
-              >
-                <ChevronLeft size={20} />
-                <span>Previous</span>
-              </button>
-            ) : (
-              <div></div> // Empty div to maintain spacing
-            )}
-
-            <button
-              onClick={handleNext}
-              disabled={!canProceed()}
-              className="flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all bg-gradient-to-r from-green-500 to-blue-500 text-white hover:from-green-600 hover:to-blue-600 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span>{currentStepIndex === stepsLength - 1 ? 'Get Results' : 'Next'}</span>
-              {currentStepIndex === stepsLength - 1 ? <Search size={20} /> : <ChevronRight size={20} />}
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+      <motion.button
+        onClick={onNext}
+        disabled={isNextDisabled || isSubmitting}
+        className="flex items-center px-6 py-3 text-base font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gradient-to-r disabled:from-slate-400 disabled:to-slate-500"
+        whileHover={{ scale: isNextDisabled || isSubmitting ? 1 : 1.05, y: isNextDisabled || isSubmitting ? 0 : -2 }}
+        whileTap={{ scale: isNextDisabled || isSubmitting ? 1 : 0.98 }}
+      >
+        {isSubmitting ? (
+          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+        ) : isFinalQuestion ? (
+          <CheckCircle className="w-5 h-5 mr-2" />
+        ) : null}
+        {isSubmitting ? 'Submitting...' : isFinalQuestion ? 'Finish & See Results' : 'Next'}
+        {!isSubmitting && !isFinalQuestion && <ChevronRight className="w-5 h-5 ml-2" />}
+      </motion.button>
+    </div>
   );
 };

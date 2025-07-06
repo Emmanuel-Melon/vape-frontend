@@ -74,9 +74,10 @@ export const QuizAnswerSchema = z.object({
   type: QuestionTypeEnum, // Added: as per payloads.md, each answer needs its question type
   questionId: z.number(),
   selectedOptionValue: z.string().optional(), // For SINGLE_SELECT
-  selectedOptionValues: z.array(z.string()).optional(), // For MULTI_SELECT
+  selectedOptionValues: z.union([z.array(z.string()), z.string()]).optional(), // For MULTI_SELECT (can be string or string[])
   rankedOptions: z.array(RankedAnswerItemSchema).optional(), // Renamed from rankedAnswers to match payloads.md
   rangeValue: z.number().optional(), // For RANGE_SLIDER
+  optionId: z.number().nullable().optional(), // ID of the specific option chosen (e.g., for single-select)
 });
 
 export const SubmitQuizAnswersInputSchema = z.object({
