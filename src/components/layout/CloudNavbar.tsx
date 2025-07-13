@@ -13,6 +13,8 @@ export const CloudNavbar: React.FC = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const { user, isAuthenticated, isLoading } = useAuth();
 
+  console.log("user", user);
+
   const navItems = [
     {
       id: 'explore',

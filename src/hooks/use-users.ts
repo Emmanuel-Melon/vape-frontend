@@ -72,13 +72,31 @@ const fetchUserById = async (id: string): Promise<User> => {
 };
 
 const fetchCurrentUser = async (): Promise<User> => {
-  const response = await fetch(`${apiUrl}/api/users/me`, {
-    credentials: 'include', // Send cookies with the request
-  });
-  if (!response.ok) {
-    throw new Error('Network response was not ok when fetching current user');
+  console.log('Fetching current user from:', `${apiUrl}/api/users/me`);
+  
+  try {
+    const response = await fetch(`${apiUrl}/api/users/me`, {
+      credentials: 'include', // Send cookies with the request
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    console.log('Response status:', response.status);
+    console.log('Response headers:', [...response.headers.entries()]);
+    
+    if (!response.ok) {
+      throw new Error(`Network response was not ok when fetching current user: ${response.status} ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log('User data received:', data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching current user:', error);
+    throw error;
   }
-  return response.json();
 };
 
 const updateUser = async ({ id, data }: { id: string; data: UpdateUserInput }): Promise<User> => {

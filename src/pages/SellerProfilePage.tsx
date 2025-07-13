@@ -4,7 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, Star, MapPin, Calendar, 
   Heart, Download, ShoppingCart, Eye, MessageCircle, 
-  Shield, Package, Users, Loader2, AlertTriangle, Award
+  Shield, Package, Users, Loader2, AlertTriangle, Award,
+  CheckCircle as Verified
 } from 'lucide-react';
 import { CloudBackground } from '../components/layout/CloudBackground';
 import { useAuth } from '../contexts/AuthContext'; // <-- Import useAuth
