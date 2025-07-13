@@ -233,3 +233,50 @@ export const useQuizAttempt = (attemptId: number | string | undefined) => {
     enabled: !!attemptId, // Only run query if attemptId is provided
   });
 };
+
+// Vibe-based recommendation schema
+export const VibeRecommendationRequestSchema = z.object({
+  text: z.string(),
+});
+
+export type VibeRecommendationRequest = z.infer<typeof VibeRecommendationRequestSchema>;
+
+// Response schema for vibe-based recommendations
+export const VibeRecommendationResponseSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  price: z.number(),
+  imageUrl: z.string().optional(),
+  features: z.array(z.string()).optional(),
+  // Add any other fields that might be in the response
+});
+
+export type VibeRecommendationResponse = z.infer<typeof VibeRecommendationResponseSchema>;
+
+// Function to fetch vaporizer recommendations based on vibe text
+const fetchVibeRecommendations = async (data: VibeRecommendationRequest): Promise<VibeRecommendationResponse> => {
+  const validatedData = VibeRecommendationRequestSchema.parse(data);
+  const response = await fetch(`${apiUrl}/api/vaporizers/recommend-by-vibe`, {
+    credentials: 'include',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(validatedData),
+  });
+  
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Network response was not ok for vibe recommendations: ${errorBody}`);
+  }
+  
+  return response.json();
+};
+
+// React Query hook for vibe-based recommendations
+export const useVibeRecommendation = () => {
+  return useMutation<VibeRecommendationResponse, Error, VibeRecommendationRequest>({
+    mutationFn: fetchVibeRecommendations,
+  });
+};

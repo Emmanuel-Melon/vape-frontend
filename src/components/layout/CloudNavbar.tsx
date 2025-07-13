@@ -119,7 +119,6 @@ export const CloudNavbar: React.FC = () => {
                 <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
                   TryThisVape
                 </h1>
-                <p className="text-xs text-gray-600 hidden lg:block">AI-Powered Recommendations</p>
               </div>
             </motion.div>
 
@@ -485,30 +484,6 @@ export const CloudNavbar: React.FC = () => {
                     </motion.button>
                   );
                 })}
-                
-                <div className="border-t border-gray-200 pt-3 mt-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    {communityLinks.map((link, index) => {
-                      const Icon = link.icon;
-                      return (
-                        <motion.button
-                          key={link.id}
-                          onClick={() => {
-                            handleCommunityClick(link.href);
-                            setShowMobileMenu(false);
-                          }}
-                          className={`flex items-center gap-2 p-3 rounded-lg bg-gradient-to-r ${link.color} text-white`}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.3 + index * 0.1 }}
-                        >
-                          <Icon size={16} />
-                          <span className="font-medium text-sm">{link.label}</span>
-                        </motion.button>
-                      );
-                    })}
-                  </div>
-                </div>
               </div>
             </motion.div>
           )}

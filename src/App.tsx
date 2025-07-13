@@ -8,6 +8,8 @@ import { SellerProfilePage } from './pages/SellerProfilePage';
 import { StoreSetupPage } from './pages/StoreSetupPage';
 import { AboutPage } from './pages/AboutPage';
 import { TemplateViewPage } from './pages/TemplateViewPage';
+import { RecommendationPage } from './pages/RecommendationPage';
+import { AdminDashboard } from './pages/AdminDashboard';
 import { NotFoundPage } from './components/layout/NotFoundPage';
 import ProductDisplayPage from './pages/ProductDisplayPage'; // Added for product display
 import { CloudNavbar } from './components/layout/CloudNavbar';
@@ -35,6 +37,7 @@ function App() {
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/" element={<HomePage />} />
                 <Route path="/quiz" element={<VaporizerQuiz quizId={1} />} />
+                <Route path="/recommendation" element={<RecommendationPage />} />
                 <Route path="/saved" element={<SavedPage />} />
                 <Route path="/explore" element={<ExplorePage />} />
                 <Route path="/about" element={<AboutPage />} />
@@ -44,6 +47,7 @@ function App() {
                 <Route path="/my-profile" element={<SellerProfilePage />} />
                 <Route path="/store-setup" element={<StoreSetupPage />} />
                 <Route path="/products/:slug" element={<ProductDisplayPage />} />
+                <Route path="/admin" element={<AdminDashboard />} />
                 {/* 404 catch-all route */}
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
